@@ -1,0 +1,420 @@
+[
+  {
+    "content": "{\r\n  \"error\": \"Endpoint not found\"\r\n}",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:23:46.693422",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "{\r\n  \"error\": \"Endpoint not found\"\r\n}",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:24:37.236882",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "主楼主北209\r\n11\r\n考试座位号",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:25:42.364593",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "主楼主北209\r\n11\r\n考试座位号",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:28:57.607047",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "主楼主北209\r\n11\r\n考试座位号",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:31:27.177020",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "主楼主北209\r\n考试座位号11",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:32:37.739149",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "### 2025/11/16\r\n下午 13：20 数分考试\r\n地点：主楼主北209\r\n考试座位号11",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:33:37.999558",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "AI 响应格式处理中",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:34:14.467037",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "from openai import OpenAI\r\nimport os\r\n\r\nclient = OpenAI(\r\n    # 如果没有配置环境变量，请用阿里云百炼API Key替换：api_key=\"sk-xxx\"\r\n    api_key=os.getenv(\"DASHSCOPE_API_KEY\"),\r\n    base_url=\"https://dashscope.aliyuncs.com/compatible-mode/v1\",\r\n)\r\n\r\nmessages = [{\"role\": \"user\", \"content\": \"你是谁\"}]\r\ncompletion = client.chat.completions.create(\r\n    model=\"qwen-plus-2025-07-28\",  # 您可以按需更换为其它深度思考模型\r\n    messages=messages,\r\n    extra_body={\"enable_thinking\": True},\r\n    stream=True\r\n)\r\nis_answering = False  # 是否进入回复阶段\r\nprint(\"\\n\" + \"=\" * 20 + \"思考过程\" + \"=\" * 20)\r\nfor chunk in completion:\r\n    delta = chunk.choices[0].delta\r\n    if hasattr(delta, \"reasoning_content\") and delta.reasoning_content is not None:\r\n        if not is_answering:\r\n            print(delta.reasoning_content, end=\"\", flush=True)\r\n    if hasattr(delta, \"content\") and delta.content:\r\n        if not is_answering:\r\n            print(\"\\n\" + \"=\" * 20 + \"完整回复\" + \"=\" * 20)\r\n            is_answering = True\r\n        print(delta.content, end=\"\", flush=True)",
+    "type": "text",
+    "urls": [
+      "https://dashscope.aliyuncs.com/compatible-mode/v1\","
+    ],
+    "timestamp": "2025-11-16T08:34:57.130335",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "Content sent to backend for classification",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:36:14.866421",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "Preview: AI 响应格式处理中...",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:36:40.127607",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "from openai import OpenAI\r\nimport os\r\n\r\nclient = OpenAI(\r\n    # 如果没有配置环境变量，请用阿里云百炼API Key替换：api_key=\"sk-xxx\"\r\n    api_key=os.getenv(\"DASHSCOPE_API_KEY\"),\r\n    base_url=\"https://dashscope.aliyuncs.com/compatible-mode/v1\",\r\n)\r\n\r\nmessages = [{\"role\": \"user\", \"content\": \"你是谁\"}]\r\ncompletion = client.chat.completions.create(\r\n    model=\"qwen-plus-2025-07-28\",  # 您可以按需更换为其它深度思考模型\r\n    messages=messages,\r\n    extra_body={\"enable_thinking\": True},\r\n    stream=True\r\n)\r\nis_answering = False  # 是否进入回复阶段\r\nprint(\"\\n\" + \"=\" * 20 + \"思考过程\" + \"=\" * 20)\r\nfor chunk in completion:\r\n    delta = chunk.choices[0].delta\r\n    if hasattr(delta, \"reasoning_content\") and delta.reasoning_content is not None:\r\n        if not is_answering:\r\n            print(delta.reasoning_content, end=\"\", flush=True)\r\n    if hasattr(delta, \"content\") and delta.content:\r\n        if not is_answering:\r\n            print(\"\\n\" + \"=\" * 20 + \"完整回复\" + \"=\" * 20)\r\n            is_answering = True\r\n        print(delta.content, end=\"\", flush=True)",
+    "type": "text",
+    "urls": [
+      "https://dashscope.aliyuncs.com/compatible-mode/v1\","
+    ],
+    "timestamp": "2025-11-16T08:37:25.903322",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "import os\r\nfrom dashscope import Generation\r\nimport dashscope\r\ndashscope.base_http_api_url = 'https://dashscope.aliyuncs.com/api/v1'\r\n\r\nmessages = [\r\n    {\"role\": \"system\", \"content\": \"You are a helpful assistant.\"},\r\n    {\"role\": \"user\", \"content\": \"你是谁？\"},\r\n]\r\nresponse = Generation.call(\r\n    # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key = \"sk-xxx\",\r\n    api_key=os.getenv(\"DASHSCOPE_API_KEY\"),\r\n    model=\"qwen-plus-2025-07-28\",\r\n    messages=messages,\r\n    result_format=\"message\",\r\n    # 开启深度思考\r\n    enable_thinking=True,\r\n)\r\n\r\nif response.status_code == 200:\r\n    # 打印思考过程\r\n    print(\"=\" * 20 + \"思考过程\" + \"=\" * 20)\r\n    print(response.output.choices[0].message.reasoning_content)\r\n    \r\n    # 打印回复\r\n    print(\"=\" * 20 + \"完整回复\" + \"=\" * 20)\r\n    print(response.output.choices[0].message.content)\r\nelse:\r\n    print(f\"HTTP返回码：{response.status_code}\")\r\n    print(f\"错误码：{response.code}\")\r\n    print(f\"错误信息：{response.message}\")",
+    "type": "text",
+    "urls": [
+      "https://dashscope.aliyuncs.com/api/v1'"
+    ],
+    "timestamp": "2025-11-16T08:41:49.663163",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.7,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "AI 响应格式处理中"
+    }
+  },
+  {
+    "content": "### 2025/11/16\r\n下午 13：20 数分考试\r\n地点：主楼主北209\r\n考试座位号11",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:50:02.885987",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "待办事项",
+      "reason": "内容包含具体的考试时间、地点和座位号，属于需要提醒和执行的个人安排，适合作为待办事项保存。"
+    }
+  },
+  {
+    "content": "11月23日\r\n星期日\r\n工科高等代数（B090011036）\r\n11月23日/08:00~10:00/学院路校区/主楼主202\r\n23\r\n考试座位号",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:50:31.718840",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "待办事项",
+      "reason": "内容包含具体的考试时间、地点和座位号，属于需要提醒和准备的重要日程信息，适合作为待办事项保存。"
+    }
+  },
+  {
+    "content": " In order to be fluent in working with mathematical statements, you need to understand the basic framework\r\n of the language of mathematics. This first lecture, we will start by learning about what logical forms math\r\nematical theorems may take, and how to manipulate those forms to make them easier to prove. In the next\r\n few lectures, we will learn several different methods of proving things.\r\n Our first building block is the notion of a proposition, which is simply a statement which is either true or\r\n false.\r\n These statements are all propositions:\r\n (1) √3 is irrational.\r\n (2) 1+1=5.\r\n (3) Julius Caesar had 2 eggs for breakfast on his 10th birthday.\r\n These statements are clearly not propositions:\r\n (4) 2+2.\r\n (5) x2+3x=5. [Whatis x?]\r\n These statements aren’t propositions either (although some books say they are). Propositions should not\r\n include fuzzy terms.\r\n (6) Arnold Schwarzenegger often eats broccoli. [What is “often?”]\r\n (7) Henry VIII was unpopular. [What is “unpopular?”]\r\n Propositions may be joined together to form more complex statements. Let P, Q, and R be variables rep\r\nresenting propositions (for example, P could stand for “3 is odd”).",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T08:54:32.105314",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "内容涉及数学逻辑基础概念，如命题的定义和示例，具有明确的知识点价值，适合作为学习笔记保存。"
+    }
+  },
+  {
+    "content": "http://127.0.0.1:5001",
+    "type": "text",
+    "urls": [
+      "http://127.0.0.1:5001"
+    ],
+    "timestamp": "2025-11-16T09:09:54.589038",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": false,
+      "note_type": "其他",
+      "reason": "该内容是一个本地回环地址，通常用于开发或测试环境，不具备长期保存的价值。"
+    }
+  },
+  {
+    "content": "https://byxt.buaa.edu.cn/",
+    "type": "text",
+    "urls": [
+      "https://byxt.buaa.edu.cn/"
+    ],
+    "timestamp": "2025-11-16T09:23:56.940708",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": false,
+      "note_type": "其他",
+      "reason": "该内容仅为一个URL链接，没有提供具体上下文或有价值的信息，无法判断其用途或重要性，因此不适合作为笔记保存。"
+    }
+  },
+  {
+    "content": "https://byxt.buaa.edu.cn/",
+    "type": "text",
+    "urls": [
+      "https://byxt.buaa.edu.cn/"
+    ],
+    "timestamp": "2025-11-16T09:43:50.834812",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "参考材料",
+      "reason": "该链接指向北京航空航天大学自动化科学与电气工程学院的官方网站，属于有价值的参考资料，可用于后续查阅学院信息、通知公告或学术资源。"
+    }
+  },
+  {
+    "content": "https://byxt.buaa.edu.cn/",
+    "type": "text",
+    "urls": [
+      "https://byxt.buaa.edu.cn/"
+    ],
+    "timestamp": "2025-11-16T11:04:54.953290",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": false,
+      "note_type": "其他",
+      "reason": "该内容是一个URL链接，指向北航研究生院网站，本身不包含具体可保存的实质性信息，仅作为访问入口，因此不适合作为笔记保存。"
+    }
+  },
+  {
+    "content": "# Markdown到HTML转换器实现指南\r\n\r\n## 核心功能需求\r\n创建一个在浏览器中将Markdown文本转换为格式化HTML的功能，包含代码语法高亮。\r\n\r\n## 技术栈\r\n- **Markdown解析**: marked.js\r\n- **代码高亮**: highlight.js\r\n- **样式**: GitHub Dark主题\r\n\r\n## 实现代码\r\n\r\n```html\r\n<!DOCTYPE html>\r\n<html lang=\"zh-CN\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n    <title>Markdown到HTML转换器</title>\r\n    <!-- 引入highlight.js样式 -->\r\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css\">\r\n    <style>\r\n        /* 基础样式 */\r\n        body {\r\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\r\n            line-height: 1.6;\r\n            color: #333;\r\n            max-width: 1000px;\r\n            margin: 0 auto;\r\n            padding: 20px;\r\n            background: #f5f5f5;\r\n        }\r\n        \r\n        .container {\r\n            display: flex;\r\n            gap: 20px;\r\n            margin-top: 20px;\r\n        }\r\n        \r\n        .editor-section, .preview-section {\r\n            flex: 1;\r\n            background: white;\r\n            border-radius: 8px;\r\n            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\r\n            overflow: hidden;\r\n        }\r\n        \r\n        .section-header {\r\n            background: #4a6cf7;\r\n            color: white;\r\n            padding: 12px 15px;\r\n            margin: 0;\r\n            font-size: 1.1rem;\r\n        }\r\n        \r\n        /* 编辑器样式 */\r\n        #editor {\r\n            width: 100%;\r\n            height: 500px;\r\n            border: none;\r\n            padding: 15px;\r\n            font-family: 'Courier New', monospace;\r\n            font-size: 14px;\r\n            resize: none;\r\n            outline: none;\r\n        }\r\n        \r\n        /* 预览区域样式 */\r\n        #preview {\r\n            padding: 20px;\r\n            height: 500px;\r\n            overflow-y: auto;\r\n        }\r\n        \r\n        /* Markdown内容样式 */\r\n        #preview h1, #preview h2, #preview h3 {\r\n            margin-top: 1.2em;\r\n            margin-bottom: 0.6em;\r\n            color: #2c3e50;\r\n        }\r\n        \r\n        #preview h1 {\r\n            border-bottom: 2px solid #eee;\r\n            padding-bottom: 10px;\r\n        }\r\n        \r\n        #preview p {\r\n            margin-bottom: 1em;\r\n        }\r\n        \r\n        #preview code {\r\n            background: #f4f4f4;\r\n            padding: 2px 6px;\r\n            border-radius: 3px;\r\n            font-family: 'Courier New', monospace;\r\n        }\r\n        \r\n        #preview pre {\r\n            background: #2d2d2d;\r\n            color: #f8f8f2;\r\n            padding: 15px;\r\n            border-radius: 5px;\r\n            overflow-x: auto;\r\n            margin: 15px 0;\r\n        }\r\n        \r\n        #preview blockquote {\r\n            border-left: 4px solid #4a6cf7;\r\n            padding-left: 15px;\r\n            margin: 15px 0;\r\n            color: #555;\r\n            font-style: italic;\r\n        }\r\n        \r\n        #preview table {\r\n            border-collapse: collapse;\r\n            width: 100%;\r\n            margin: 15px 0;\r\n        }\r\n        \r\n        #preview table, #preview th, #preview td {\r\n            border: 1px solid #ddd;\r\n        }\r\n        \r\n        #preview th, #preview td {\r\n            padding: 8px 12px;\r\n            text-align: left;\r\n        }\r\n        \r\n        #preview th {\r\n            background: #f4f4f4;\r\n        }\r\n        \r\n        #preview ul, #preview ol {\r\n            margin: 15px 0;\r\n            padding-left: 30px;\r\n        }\r\n        \r\n        #preview img {\r\n            max-width: 100%;\r\n        }\r\n    </style>\r\n</head>\r\n<body>\r\n    <h1>Markdown到HTML转换器</h1>\r\n    \r\n    <div class=\"container\">\r\n        <div class=\"editor-section\">\r\n            <h3 class=\"section-header\">Markdown输入</h3>\r\n            <textarea id=\"editor\" placeholder=\"在此输入Markdown内容...\"></textarea>\r\n        </div>\r\n        \r\n        <div class=\"preview-section\">\r\n            <h3 class=\"section-header\">HTML预览</h3>\r\n            <div id=\"preview\">\r\n                <p style=\"text-align: center; color: #999; margin-top: 50px;\">\r\n                    HTML预览将在这里显示...\r\n                </p>\r\n            </div>\r\n        </div>\r\n    </div>\r\n\r\n    <!-- 引入必要的库 -->\r\n    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js\"></script>\r\n    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js\"></script>\r\n    \r\n    <script>\r\n        // 配置marked选项\r\n        marked.setOptions({\r\n            highlight: function(code, lang) {\r\n                if (lang && hljs.getLanguage(lang)) {\r\n                    return hljs.highlight(code, { language: lang }).value;\r\n                }\r\n                return hljs.highlightAuto(code).value;\r\n            },\r\n            breaks: true,\r\n            gfm: true\r\n        });\r\n        \r\n        // 获取DOM元素\r\n        const editor = document.getElementById('editor');\r\n        const preview = document.getElementById('preview');\r\n        \r\n        // 编辑器内容变化时更新预览\r\n        editor.addEventListener('input', function() {\r\n            updatePreview(editor.value);\r\n        });\r\n        \r\n        // 更新预览函数\r\n        function updatePreview(markdown) {\r\n            if (markdown) {\r\n                preview.innerHTML = marked.parse(markdown);\r\n            } else {\r\n                preview.innerHTML = '<p style=\"text-align: center; color: #999; margin-top: 50px;\">HTML预览将在这里显示...</p>';\r\n            }\r\n        }\r\n        \r\n        // 初始化示例Markdown\r\n        const sampleMarkdown = `# Markdown 示例\r\n\r\n## 文本格式\r\n**粗体文本**、*斜体文本*、~~删除线~~\r\n\r\n## 列表\r\n- 无序列表项 1\r\n- 无序列表项 2\r\n  - 嵌套列表项\r\n\r\n1. 有序列表项 1\r\n2. 有序列表项 2\r\n\r\n## 代码\r\n行内代码: \\`console.log(\"Hello\")\\`\r\n\r\n代码块:\r\n\\`\\`\\`javascript\r\nfunction greet(name) {\r\n    return \"Hello, \" + name + \"!\";\r\n}\r\n\\`\\`\\`\r\n\r\n## 引用\r\n> 这是一个引用块\r\n> 可以跨越多行\r\n\r\n## 表格\r\n| 列1 | 列2 | 列3 |\r\n|-----|-----|-----|\r\n| 数据1 | 数据2 | 数据3 |\r\n\r\n## 链接和图片\r\n[Markdown指南](https://www.markdownguide.org)\r\n\r\n![示例图片](https://via.placeholder.com/150)`;\r\n        \r\n        // 设置示例内容\r\n        editor.value = sampleMarkdown;\r\n        updatePreview(sampleMarkdown);\r\n    </script>\r\n</body>\r\n</html>\r\n```\r\n\r\n## 实现说明\r\n\r\n### 核心功能\r\n1. **Markdown解析**: 使用marked.js库将Markdown文本转换为HTML\r\n2. **代码高亮**: 集成highlight.js为代码块添加语法高亮\r\n3. **实时预览**: 监听编辑器输入事件，实时更新预览区域\r\n\r\n### 关键配置\r\n- 设置marked选项启用GitHub风格Markdown和自动换行\r\n- 配置highlight.js自动检测代码语言并进行高亮\r\n\r\n### 使用方法\r\n1. 在左侧编辑器中输入或修改Markdown内容\r\n2. 右侧预览区域会实时显示转换后的HTML效果\r\n3. 支持所有标准Markdown语法元素\r\n\r\n这个实现完全在客户端运行，无需服务器支持，适合集成到任何Web项目中。",
+    "type": "text",
+    "urls": [
+      "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css\">",
+      "https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js\"></script>",
+      "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js\"></script>",
+      "https://www.markdownguide.org)",
+      "https://via.placeholder.com/150)`;"
+    ],
+    "timestamp": "2025-11-16T15:36:07.257717",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.99,
+      "is_note": true,
+      "note_type": "代码片段",
+      "reason": "内容包含完整的Markdown到HTML转换器实现代码，包含详细的技术栈、样式和功能说明，具有明确的复用价值，适合作为前端开发的代码参考。"
+    }
+  },
+  {
+    "content": "# Markdown转HTML实现方案\r\n\r\n## 核心功能\r\n在浏览器中将Markdown文本实时转换为格式化HTML，支持代码语法高亮。\r\n\r\n## 必需依赖\r\n```html\r\n<!-- marked.js - Markdown解析 -->\r\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js\"></script>\r\n\r\n<!-- highlight.js - 代码高亮 -->\r\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js\"></script>\r\n<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css\">\r\n```\r\n\r\n## 核心实现代码\r\n```javascript\r\n// 配置Markdown解析器\r\nmarked.setOptions({\r\n    highlight: function(code, lang) {\r\n        return hljs.highlightAuto(code).value;\r\n    },\r\n    breaks: true,\r\n    gfm: true\r\n});\r\n\r\n// Markdown转HTML函数\r\nfunction markdownToHtml(markdown) {\r\n    return marked.parse(markdown);\r\n}\r\n\r\n// 使用示例\r\nconst markdownText = `# 标题\\n**粗体**和*斜体*\\n\\`代码\\`和\\n\\`\\`\\`js\\nconsole.log(\"代码块\")\\n\\`\\`\\``;\r\n\r\nconst htmlOutput = markdownToHtml(markdownText);\r\ndocument.getElementById('preview').innerHTML = htmlOutput;\r\n```\r\n\r\n## 关键配置说明\r\n- `highlight`: 启用代码语法高亮\r\n- `breaks`: 将换行符转换为`<br>`\r\n- `gfm`: 启用GitHub风格的Markdown\r\n\r\n## 使用方法\r\n1. 引入依赖库\r\n2. 调用`markdownToHtml()`函数转换Markdown\r\n3. 将返回的HTML插入到页面中\r\n\r\n此方案完全在客户端运行，无需服务器支持。",
+    "type": "text",
+    "urls": [
+      "https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js\"></script>",
+      "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js\"></script>",
+      "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css\">"
+    ],
+    "timestamp": "2025-11-16T15:38:07.715661",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "代码片段",
+      "reason": "内容包含完整的Markdown转HTML的实现方案，包括依赖引入、配置、核心代码和使用示例，具有明确的技术实现和可复用性，适合作为代码片段保存。"
+    }
+  },
+  {
+    "content": "# Markdown转HTML实现方案\r\n\r\n## 核心功能\r\n在浏览器中将Markdown文本实时转换为格式化HTML，支持代码语法高亮。\r\n\r\n## 必需依赖\r\n```html\r\n<!-- marked.js - Markdown解析 -->\r\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js\"></script>\r\n\r\n<!-- highlight.js - 代码高亮 -->\r\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js\"></script>\r\n<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css\">\r\n```\r\n\r\n## 核心实现代码\r\n```javascript\r\n// 配置Markdown解析器\r\nmarked.setOptions({\r\n    highlight: function(code, lang) {\r\n        return hljs.highlightAuto(code).value;\r\n    },\r\n    breaks: true,\r\n    gfm: true\r\n});\r\n\r\n// Markdown转HTML函数\r\nfunction markdownToHtml(markdown) {\r\n    return marked.parse(markdown);\r\n}\r\n\r\n// 使用示例\r\nconst markdownText = `# 标题\\n**粗体**和*斜体*\\n\\`代码\\`和\\n\\`\\`\\`js\\nconsole.log(\"代码块\")\\n\\`\\`\\``;\r\n\r\nconst htmlOutput = markdownToHtml(markdownText);\r\ndocument.getElementById('preview').innerHTML = htmlOutput;\r\n```\r\n\r\n## 关键配置说明\r\n- `highlight`: 启用代码语法高亮\r\n- `breaks`: 将换行符转换为`<br>`\r\n- `gfm`: 启用GitHub风格的Markdown\r\n\r\n## 使用方法\r\n1. 引入依赖库\r\n2. 调用`markdownToHtml()`函数转换Markdown\r\n3. 将返回的HTML插入到页面中\r\n\r\n此方案完全在客户端运行，无需服务器支持。",
+    "type": "text",
+    "urls": [
+      "https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js\"></script>",
+      "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js\"></script>",
+      "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css\">"
+    ],
+    "timestamp": "2025-11-16T15:39:38.288336",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.98,
+      "is_note": true,
+      "note_type": "代码片段",
+      "reason": "内容包含完整的Markdown转HTML实现方案，包括依赖引入、核心代码和配置说明，具有明确的技术实现和可复用的代码，适合作为前端开发中的代码片段笔记保存。"
+    }
+  },
+  {
+    "content": "数学语言基础与命题逻辑",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T15:46:57.036042",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "该内容涉及数学语言基础与命题逻辑，属于学术性知识，具有长期参考价值，适合归类为零散知识类笔记。"
+    }
+  },
+  {
+    "content": "数学语言基础与命题逻辑",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T15:50:07.166866",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "内容涉及数学语言基础与命题逻辑，属于学术性知识，适合归类为零散知识类笔记，便于后续学习和参考。"
+    }
+  },
+  {
+    "content": "数学语言基础与命题逻辑",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T15:51:11.943409",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "内容涉及数学语言基础与命题逻辑，属于学术性知识点，适合归类为零散知识类笔记。"
+    }
+  },
+  {
+    "content": "数学语言基础与命题逻辑",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T15:52:00.808091",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "该内容涉及数学语言基础与命题逻辑，属于学术性知识点，适合归类为零散知识类笔记，便于后续学习和查阅。"
+    }
+  },
+  {
+    "content": "数学语言基础与命题逻辑",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T15:59:40.806858",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "该内容涉及数学语言基础与命题逻辑，属于理论性知识，适合归类为学习或参考资料中的零散知识点。"
+    }
+  },
+  {
+    "content": "数学语言基础与命题逻辑",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T16:02:50.411657",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "内容涉及数学语言基础与命题逻辑，属于学术性知识点，适合归类为零散知识类笔记，便于后续学习和查阅。"
+    }
+  },
+  {
+    "content": "数学语言基础与命题逻辑",
+    "type": "text",
+    "urls": [],
+    "timestamp": "2025-11-16T16:04:22.651025",
+    "source": "clipboard_monitor",
+    "ai_classification": {
+      "confidence": 0.95,
+      "is_note": true,
+      "note_type": "零散知识",
+      "reason": "该内容涉及数学语言基础与命题逻辑，属于学术性知识，具有长期参考价值，适合作为学习或复习的笔记。"
+    }
+  }
+]

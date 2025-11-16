@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaTeX 渲染测试</title>
+    <!-- KaTeX - LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+</head>
+<body>
+    <h1>LaTeX 渲染测试</h1>
+    <div id="test-content">
+        <h2>行内公式测试</h2>
+        <div class="math-inline">$E = mc^2$</div>
+        <div class="math-inline">$1 + 1 = 2$</div>
+        <div class="math-inline">$\sum_{i=1}^n i = \frac{n(n+1)}{2}$</div>
+        
+        <h2>块级公式测试</h2>
+        <div class="math-block">$$\int_{a}^{b} x^2 dx$$</div>
+        <div class="math-block">$$\frac{dy}{dx} = y$$</div>
+    </div>
+    
+    <h2>Marked.js 整合测试</h2>
+    <div id="marked-test"></div>
+    
+    <script>
+        // 测试 KaTeX 直接渲染
+        console.log("Testing KaTeX direct rendering...");
+        try {
+            const inlineMath = katex.renderToString("E = mc^2", { displayMode: false });
+            const blockMath = katex.renderToString("\int_{a}^{b} x^2 dx", { displayMode: true });
+            console.log("Inline LaTeX:", inlineMath);
+            console.log("Block LaTeX:", blockMath);
+        } catch (e) {
+            console.error("KaTeX rendering error:", e);
+        }
+        
+        // 测试 Marked.js 渲染
+        console.log("\nTesting Marked.js rendering...");
+        try {
+            const markdownContent = `
+# Markdown + LaTeX 测试
+
+行内公式：$E = mc^2$，$1 + 1 = 2$
+
+块级公式：
+$$\int_{a}^{b} x^2 dx$$
+$$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
+            `;
+            
+            // 配置 Marked.js 支持 LaTeX
+            const renderer = new marked.Renderer();
+            
+            // 自定义渲染配置
+            const markedOptions = {
+                highlight: function(code, lang) {
+                    return code;
+                },
+                gfm: true,
+                breaks: true,
+                extensions: [
+                    {
+                        name: 'math',
+                        level: 'inline',
+                        start(src) {
+                            return src.match(/\$/)[0]?.index;
+                        },
+                        tokenizer(src, tokens) {
+                            const match = src.match(/^\$([^$]+)\$/);
+                            if (match) {
+                                return {
+                                    type: 'math',
+                                    raw: match[0],
+                                    text: match[1]
+                                };
+                            }
+                        },
+                        renderer(token) {
+                            return katex.renderToString(token.text, {
+                                throwOnError: false,
+                                displayMode: false
+                            });
+                        }
+                    },
+                    {
+                        name: 'math-block',
+                        level: 'block',
+                        start(src) {
+                            return src.match(/^\$\$/)[0]?.index;
+                        },
+                        tokenizer(src, tokens) {
+                            const match = src.match(/^\$\$([\s\S]*?)\$\$/);
+                            if (match) {
+                                return {
+                                    type: 'math-block',
+                                    raw: match[0],
+                                    text: match[1]
+                                };
+                            }
+                        },
+                        renderer(token) {
+                            return katex.renderToString(token.text, {
+                                throwOnError: false,
+                                displayMode: true
+                            });
+                        }
+                    }
+                ]
+            };
+            
+            const renderedContent = marked.parse(markdownContent, markedOptions);
+            document.getElementById('marked-test').innerHTML = renderedContent;
+            console.log("Marked.js rendered content:", renderedContent);
+            console.log("Marked.js test completed successfully");
+        } catch (e) {
+            console.error("Marked.js rendering error:", e);
+        }
+        
+        // 使用 auto-render 测试
+        console.log("\nTesting KaTeX auto-render...");
+        try {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$", right: "$", display: false },
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
+                ]
+            });
+            console.log("KaTeX auto-render completed successfully");
+        } catch (e) {
+            console.error("KaTeX auto-render error:", e);
+        }
+    </script>
+</body>
+</html>

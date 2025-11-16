@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能工作助手 - AI Noter</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- Quill Rich Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+    <!-- KaTeX - LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<!-- highlight.js - 代码高亮 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+<script>
+        // Configure marked.js
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                highlight: function(code, lang) {
+                    return hljs.highlightAuto(code).value;
+                },
+                gfm: true,
+                breaks: true,
+                html: true
+            });
+        } else {
+            console.error('marked.js library not loaded');
+        }
+
+        // LaTeX渲染函数
+        function renderLatex(html) {
+            // 处理行内公式 $...$（允许公式周围有空格）
+            html = html.replace(/\$\s*(.*?)\s*\$/g, (match, formula) => {
+                try {
+                    return katex.renderToString(formula, { throwOnError: false });
+                } catch (e) {
+                    return match;
+                }
+            });
+
+            // 处理块级公式 $$...$$（允许公式周围有空格）
+            html = html.replace(/\$\$\s*(.*?)\s*\$\$/gs, (match, formula) => {
+                try {
+                    return katex.renderToString(formula, {
+                        throwOnError: false,
+                        displayMode: true
+                    });
+                } catch (e) {
+                    return match;
+                }
+            });
+
+            return html;
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #5B21B6;
+            --primary-light: #7C3AED;
+            --secondary: #EC4899;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --surface-light: #334155;
+            --text-primary: #F1F5F9;
+            --text-secondary: #CBD5E1;
+            --border: #475569;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        #app {
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            background-color: var(--background);
+        }
+
+        /* ==================== 侧边栏 ==================== */
+        .sidebar {
+            width: 280px;
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .filter-section {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-section label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-section select {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: var(--surface-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .notes-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .note-item {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background-color: var(--surface-light);
+            border-left: 3px solid var(--primary-light);
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .note-item:hover {
+            background-color: var(--border);
+            transform: translateX(4px);
+        }
+
+        .note-item.active {
+            background-color: var(--primary);
+            border-left-color: var(--secondary);
+        }
+
+        .note-item-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-item-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .note-item-type {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            background-color: var(--primary-light);
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+        }
+
+        /* ==================== 主内容区 ==================== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .toolbar-section {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-light);
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn-small {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: var(--surface-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        /* ==================== 编辑区 ==================== */
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 1.5rem;
+        }
+
+        .editor-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .editor-tab {
+            padding: 0.75rem 1rem;
+            background: none;
+            color: var(--text-secondary);
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .editor-tab.active {
+            color: var(--primary-light);
+            border-bottom-color: var(--primary-light);
+        }
+
+        .editor-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .editor-container > div {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .editor-content {
+            flex: 1;
+            overflow-y: auto;
+            background-color: var(--surface);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .ql-container {
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .ql-editor {
+            min-height: 300px;
+            color: var(--text-primary);
+            background-color: var(--surface);
+        }
+
+        .ql-editor.ql-blank::before {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .ql-toolbar {
+            background-color: var(--surface-light);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+
+        .ql-toolbar button {
+            color: var(--text-secondary);
+        }
+
+        .ql-toolbar button:hover {
+            color: var(--primary-light);
+        }
+
+        .ql-toolbar button.ql-active {
+            color: var(--primary-light);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: var(--surface-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* ==================== 滚动条样式 ==================== */
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        /* 滚动条轨道 */
+        ::-webkit-scrollbar-track {
+            background: var(--surface-light);
+            border-radius: 4px;
+        }
+
+        /* 滚动条滑块 */
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        /* 滚动条滑块悬停 */
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+
+        /* Firefox 滚动条样式 */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) var(--surface-light);
+        }
+
+        /* ==================== 模态框 ==================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            background-color: var(--surface);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+        }
+
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: flex-end;
+        }
+
+        /* ==================== 通知 ==================== */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background-color: var(--success);
+            color: white;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+            z-index: 2000;
+        }
+
+        .notification.error {
+            background-color: var(--error);
+        }
+
+        .notification.warning {
+            background-color: var(--warning);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ==================== 空状态 ==================== */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ==================== 响应式 ==================== */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .toolbar {
+                flex-direction: column;
+            }
+
+            .input-group {
+                width: 100% !important;
+            }
+        }
+
+        /* ==================== 加载状态 ==================== */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary-light);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .ai-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background-color: var(--primary-light);
+            color: white;
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .classification-result {
+            background-color: var(--surface-light);
+            border-left: 3px solid var(--primary-light);
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+
+        .classification-result h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-light);
+        }
+
+        .classification-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .confidence-bar {
+            display: inline-block;
+            width: 80px;
+            height: 6px;
+            background-color: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background-color: var(--success);
+            border-radius: 3px;
+        }
+
+        .notes-toolbar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0 0.5rem;
+        }
+
+        .note-select {
+            margin-right: 0.5rem;
+            padding: 1rem 0 0 1rem;
+        }
+
+        .note-item {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--surface-light);
+        }
+
+        /* Firefox scrollbar styling */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) var(--surface);
+        }
+
+        .note-content {
+            flex: 1;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <script>
+        const { createApp, ref, reactive, computed, onMounted, onUnmounted } = Vue;
+
+        createApp({
+            template: `
+                <div class="container">
+                    <!-- 左侧栏：笔记列表 -->
+                    <div class="sidebar">
+                        <div class="sidebar-header">
+                            <h1>AI Noter</h1>
+                            <p>智能工作助手</p>
+                        </div>
+
+                        <div class="filter-section">
+                            <label>笔记类型</label>
+                            <select v-model="filterType" @change="filterNotes">
+                                <option value="">全部</option>
+                                <option value="待办事项">待办事项</option>
+                                <option value="零散知识">零散知识</option>
+                                <option value="灵感想法">灵感想法</option>
+                                <option value="参考材料">参考材料</option>
+                                <option value="会议记录">会议记录</option>
+                                <option value="代码片段">代码片段</option>
+                            </select>
+                        </div>
+
+                        <div class="notes-toolbar">
+                            <button class="btn btn-primary" @click="showNewNoteModal = true">📝 新建笔记</button>
+                            <button class="btn btn-success" @click="showPasteModal = true">📋 粘贴内容</button>
+                            <button class="btn btn-danger" @click="showDeleteConfirm = true" :disabled="selectedNotes.length === 0">🗑️ 删除</button>
+                            <button class="btn btn-secondary" @click="loadNotes">🔄 刷新</button>
+                        </div>
+
+                        <div class="notes-list">
+                            <div v-if="filteredNotes.length === 0" class="empty-state" style="height: auto; padding: 2rem 0; min-height: auto;">
+                                <div style="color: var(--text-secondary); text-align: center;">
+                                    <p>暂无笔记</p>
+                                </div>
+                            </div>
+                            <div v-for="note in filteredNotes" :key="note.id" class="note-item" :class="{ active: selectedNoteId === note.id }">
+                                <div class="note-select">
+                                    <input type="checkbox" v-model="selectedNotes" :value="note.id" />
+                                </div>
+                                <div class="note-content" @click="selectNote(note)">
+                                    <div class="note-item-title">{{ note.title }}</div>
+                                    <div class="note-item-meta">
+                                        <span class="note-item-type">{{ note.type }}</span>
+                                        <span>{{ formatDate(note.created_at) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 主内容区 -->
+                    <div class="main-content">
+                        <!-- 工具栏 -->
+                        <div class="toolbar">
+                            <div class="toolbar-section">
+                                <button class="btn" @click="showNewNoteModal = true">
+                                    <span>➕</span>
+                                    <span>新建笔记</span>
+                                </button>
+                                <button class="btn btn-secondary" @click="showPasteModal = true">
+                                    <span>📋</span>
+                                    <span>粘贴内容</span>
+                                </button>
+                            </div>
+                            <div class="toolbar-section">
+                                <button class="btn btn-secondary btn-small" @click="loadNotes" v-if="notes.length > 0">
+                                    <span v-if="!isLoadingNotes">🔄</span>
+                                    <span v-else class="loading" style="border-width: 2px;"></span>
+                                </button>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" v-model="searchQuery" placeholder="搜索笔记...">
+                            </div>
+                        </div>
+
+                        <!-- 编辑区 -->
+                        <div class="editor-container">
+                            <div v-if="selectedNote">
+                                <!-- 标签页 -->
+                                <div class="editor-tabs">
+                                    <button class="editor-tab" :class="{ active: currentTab === 'organized' }" @click="currentTab = 'organized'">
+                                        AI 整理版
+                                    </button>
+                                    <button class="editor-tab" :class="{ active: currentTab === 'edit' }" @click="currentTab = 'edit'">
+                                        编辑
+                                    </button>
+                                    <button class="editor-tab" :class="{ active: currentTab === 'original' }" @click="currentTab = 'original'">
+                                        原始内容
+                                    </button>
+                                </div>
+
+                                <!-- 内容区 -->
+                                <div class="editor-content">
+                                    <!-- AI 整理版标签页 -->
+                                    <div v-if="currentTab === 'organized'" v-html="selectedNote.ai_organized_markdown" style="line-height: 1.8;"></div>
+
+                                    <!-- 编辑标签页 -->
+                                    <div v-if="currentTab === 'edit'">
+                                        <div class="form-group">
+                                            <label>标题</label>
+                                            <input type="text" v-model="editingNote.title" placeholder="输入笔记标题">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>类型</label>
+                                            <select v-model="editingNote.type" style="width: 100%; padding: 0.5rem; background-color: var(--surface-light); color: var(--text-primary); border: 1px solid var(--border); border-radius: 0.375rem;">
+                                                <option value="待办事项">待办事项</option>
+                                                <option value="零散知识">零散知识</option>
+                                                <option value="灵感想法">灵感想法</option>
+                                                <option value="参考材料">参考材料</option>
+                                                <option value="会议记录">会议记录</option>
+                                                <option value="代码片段">代码片段</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>编辑内容</label>
+                                            <textarea v-model="editingNote.content" placeholder="在这里编辑或补充内容..."></textarea>
+                                        </div>
+                                        <button class="btn btn-success" @click="saveNote">💾 保存修改</button>
+                                    </div>
+
+                                    <!-- 原始内容标签页 -->
+                                <div v-if="currentTab === 'original'" style="white-space: pre-wrap; font-family: monospace; font-size: 0.9rem;">
+                                    <div v-html="(selectedNote.original_content || '暂无原始内容').replace(/\\n/g, '<br>')"></div>
+                                </div>
+                                </div>
+                            </div>
+                            <div v-else class="empty-state">
+                                <div class="empty-state-icon">📝</div>
+                                <div class="empty-state-title">暂无笔记</div>
+                                <p>创建新笔记或从剪切板粘贴内容开始</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 模态框：新建笔记 -->
+                    <div v-if="showNewNoteModal" class="modal-overlay" @click.self="showNewNoteModal = false">
+                        <div class="modal">
+                            <div class="modal-header">新建笔记</div>
+                            <div class="form-group">
+                                <label>标题</label>
+                                <input type="text" v-model="newNote.title" placeholder="输入笔记标题">
+                            </div>
+                            <div class="form-group">
+                                <label>内容</label>
+                                <textarea v-model="newNote.content" placeholder="粘贴或输入内容..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>类型</label>
+                                <select v-model="newNote.type" style="width: 100%; padding: 0.5rem; background-color: var(--surface-light); color: var(--text-primary); border: 1px solid var(--border); border-radius: 0.375rem;">
+                                    <option value="零散知识">零散知识</option>
+                                    <option value="待办事项">待办事项</option>
+                                    <option value="灵感想法">灵感想法</option>
+                                    <option value="参考材料">参考材料</option>
+                                    <option value="会议记录">会议记录</option>
+                                    <option value="代码片段">代码片段</option>
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" @click="showNewNoteModal = false">取消</button>
+                                <button class="btn btn-success" @click="createNote" v-if="!isCreating">创建</button>
+                                <button class="btn btn-success" disabled v-else>
+                                    <span class="loading" style="border-width: 2px;"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 模态框：粘贴内容 -->
+                    <div v-if="showPasteModal" class="modal-overlay" @click.self="showPasteModal = false">
+                        <div class="modal">
+                            <div class="modal-header">粘贴内容处理</div>
+                            <div class="form-group">
+                                <label>输入或粘贴内容</label>
+                                <textarea v-model="pasteContent" placeholder="在这里粘贴内容..."></textarea>
+                            </div>
+
+                            <div v-if="classificationResult" class="classification-result">
+                                <h3>分类结果 <span class="ai-badge">AI</span></h3>
+                                <div class="classification-row">
+                                    <span>是否为笔记：</span>
+                                    <strong>{{ classificationResult.is_note ? '是' : '否' }}</strong>
+                                </div>
+                                <div class="classification-row">
+                                    <span>笔记类型：</span>
+                                    <strong>{{ classificationResult.note_type }}</strong>
+                                </div>
+                                <div class="classification-row">
+                                    <span>可信度：</span>
+                                    <div class="confidence-bar">
+                                        <div class="confidence-fill" :style="{ width: (classificationResult.confidence * 100) + '%' }"></div>
+                                    </div>
+                                </div>
+                                <div class="classification-row">
+                                    <span>理由：</span>
+                                    <span>{{ classificationResult.reason }}</span>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" @click="showPasteModal = false">取消</button>
+                                <button class="btn" @click="classifyContent" v-if="pasteContent && !classificationResult" v-bind:disabled="isClassifying">
+                                    <span v-if="isClassifying" class="loading" style="border-width: 2px;"></span>
+                                    <span v-else>🤖 AI 分类</span>
+                                </button>
+                                <button class="btn btn-success" @click="processClassifiedContent" v-if="classificationResult" v-bind:disabled="isProcessing">
+                                    <span v-if="isProcessing" class="loading" style="border-width: 2px;"></span>
+                                    <span v-else>✅ 处理内容</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 删除确认模态框 -->
+                    <div v-if="showDeleteConfirm" class="modal-overlay" @click.self="showDeleteConfirm = false">
+                        <div class="modal">
+                            <div class="modal-header">删除确认</div>
+                            <div class="modal-body">
+                                <p>确定要删除{{ selectedNotes.length }}条笔记吗？此操作不可撤销。</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" @click="showDeleteConfirm = false">取消</button>
+                                <button class="btn btn-danger" @click="deleteNotes">确定删除</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 通知 -->
+                    <div v-for="(notification, index) in notifications" :key="index" class="notification" :class="notification.type">
+                        {{ notification.message }}
+                    </div>
+                </div>
+            `,
+
+            setup() {
+                const API_BASE = 'http://127.0.0.1:5001/api';
+
+                // 状态
+                const notes = ref([]);
+                const selectedNote = ref(null);
+                const selectedNoteId = ref(null);
+                const searchQuery = ref('');
+                const filterType = ref('');
+                const currentTab = ref('organized');
+                const pasteContent = ref('');
+                const classificationResult = ref(null);
+                const notifications = ref([]);
+
+                // 模态框状态
+                const showNewNoteModal = ref(false);
+                const showPasteModal = ref(false);
+                const isLoadingNotes = ref(false);
+                const isCreating = ref(false);
+                const isClassifying = ref(false);
+                const isProcessing = ref(false);
+
+                // 编辑状态
+                const newNote = reactive({
+                    title: '',
+                    content: '',
+                    type: '零散知识'
+                });
+
+                const editingNote = reactive({
+                    title: '',
+                    type: '',
+                    content: '',
+                    tags: [],
+                    is_pinned: false
+                });
+
+                // 批量删除状态
+                const selectedNotes = ref([]);
+                const showDeleteConfirm = ref(false);
+
+                // 计算属性
+                const filteredNotes = computed(() => {
+                    let result = notes.value;
+
+                    if (filterType.value) {
+                        result = result.filter(note => note.type === filterType.value);
+                    }
+
+                    if (searchQuery.value) {
+                        const query = searchQuery.value.toLowerCase();
+                        result = result.filter(note =>
+                            note.title.toLowerCase().includes(query) ||
+                            note.summary.toLowerCase().includes(query)
+                        );
+                    }
+
+                    return result;
+                });
+
+                // 方法
+                const showNotification = (message, type = 'success') => {
+                    notifications.value.push({ message, type });
+                    setTimeout(() => {
+                        notifications.value.shift();
+                    }, 3000);
+                };
+
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return '';
+                    const date = new Date(dateStr);
+                    return date.toLocaleDateString('zh-CN');
+                };
+
+                const loadNotes = async () => {
+                try {
+                    isLoadingNotes.value = true;
+                    // 添加时间戳参数确保每次请求都是唯一的，避免浏览器缓存
+                    const response = await axios.get(`${API_BASE}/notes?timestamp=${new Date().getTime()}`);
+                    notes.value = response.data.notes.map(note => ({
+                        ...note,
+                        original_content: note.original_content || '',
+                        ai_organized_markdown: note.ai_organized_markdown || '',
+                        user_edited_content: note.user_edited_content || ''
+                    }));
+                    showNotification(`已加载 ${notes.value.length} 条笔记`);
+                } catch (error) {
+                    showNotification('加载笔记失败', 'error');
+                    console.error(error);
+                } finally {
+                    isLoadingNotes.value = false;
+                }
+            };
+
+                const deleteNotes = async () => {
+                    try {
+                        if (selectedNotes.value.length === 0) return;
+                        
+                        const response = await axios.delete(`${API_BASE}/notes/batch-delete`, {
+                            data: {
+                                note_ids: selectedNotes.value
+                            }
+                        });
+                        
+                        showNotification(`${response.data.deleted_count}条笔记已删除`);
+                        await loadNotes();
+                        
+                        // 重置状态
+                        showDeleteConfirm.value = false;
+                        selectedNotes.value = [];
+                        selectedNote.value = null;
+                        selectedNoteId.value = null;
+                    } catch (error) {
+                        showNotification('删除笔记失败', 'error');
+                        console.error(error);
+                    }
+                };
+
+                const selectNote = async (note) => {
+                    try {
+                        selectedNoteId.value = note.id;
+                        const response = await axios.get(`${API_BASE}/notes/${note.id}`);
+                        const content = response.data.content;
+
+                        // 解析 Markdown 文件提取各个部分
+                        const sections = {
+                            original_content: '',
+                            ai_organized_markdown: '',
+                            user_edited_content: ''
+                        };
+
+                        // 替换为基于分隔符的内容提取
+                    const sectionsArray = content.split(/\r?\n---\s*\r?\n/);
+                    sections.original_content = '';
+                    sections.ai_organized_markdown = '';
+                    for (const section of sectionsArray) {
+                            if (section.trim().startsWith('## 原始内容')) {
+                                sections.original_content = section.replace(/^## 原始内容\s*/, '').trim();
+                            } else if (section.trim().startsWith('## AI 整理内容')) {
+                                const aiContent = section.replace(/^## AI 整理内容\s*/, '').trim();
+                                try {
+                                    const html = marked.parse(aiContent) || '';
+                                    sections.ai_organized_markdown = renderLatex(html);
+                                } catch (error) {
+                                    console.error('解析AI整理内容失败:', error);
+                                    sections.ai_organized_markdown = '';
+                                }
+                            }
+                        }
+
+                        // 提取整个md文档内容作为编辑内容
+                        selectedNote.value = { ...note, content, ...sections };
+
+            // DOM更新后初始化语法高亮和LaTeX渲染
+            await Vue.nextTick();
+            hljs.highlightAll();
+            // 渲染LaTeX数学公式
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false }
+                ],
+                throwOnError: false
+            });
+
+                        // 更新编辑表单
+                        Object.assign(editingNote, {
+                            title: note.title,
+                            type: note.type,
+                            content: content,
+                            tags: note.tags || [],
+                            is_pinned: note.is_pinned || false
+                        });
+
+                        currentTab.value = 'organized';
+                    } catch (error) {
+                        showNotification('加载笔记内容失败', 'error');
+                        console.error(error);
+                    }
+                };
+
+                // 监听标签页切换，重新渲染LaTeX
+                Vue.watch(() => currentTab.value, (newTab) => {
+                    if (newTab === 'organized' && selectedNote.value) {
+                        Vue.nextTick(() => {
+                            renderMathInElement(document.querySelector('.editor-content'), {
+                                delimiters: [
+                                    { left: '$$', right: '$$', display: true },
+                                    { left: '$', right: '$', display: false }
+                                ],
+                                throwOnError: false
+                            });
+                        });
+                    }
+                });
+
+                const createNote = async () => {
+                    if (!newNote.title || !newNote.content) {
+                        showNotification('请填写标题和内容', 'warning');
+                        return;
+                    }
+
+                    try {
+                        isCreating.value = true;
+
+                        // 先调用分类 API
+                        const classifyResponse = await axios.post(`${API_BASE}/classify-content`, {
+                            content: newNote.content
+                        });
+
+                        // 再调用整理 API
+                        const organizeResponse = await axios.post(`${API_BASE}/organize-content`, {
+                            content: newNote.content,
+                            note_type: newNote.type
+                        });
+
+                        // 保存笔记
+                        await axios.post(`${API_BASE}/save-note`, {
+                            title: newNote.title,
+                            type: newNote.type,
+                            original_content: newNote.content,
+                            organized_markdown: await marked.parse(organizeResponse.data.organized_markdown),
+                            summary: organizeResponse.data.summary,
+                            tags: []
+                        });
+
+                        showNotification('笔记创建成功');
+                        await loadNotes();
+                        showNewNoteModal.value = false;
+                        newNote.title = '';
+                        newNote.content = '';
+                        newNote.type = '零散知识';
+                    } catch (error) {
+                        showNotification('创建笔记失败', 'error');
+                        console.error(error);
+                    } finally {
+                        isCreating.value = false;
+                    }
+                };
+
+                const classifyContent = async () => {
+                    try {
+                        isClassifying.value = true;
+                        const response = await axios.post(`${API_BASE}/classify-content`, {
+                            content: pasteContent.value
+                        });
+                        classificationResult.value = response.data;
+                    } catch (error) {
+                        showNotification('分类失败', 'error');
+                        console.error(error);
+                    } finally {
+                        isClassifying.value = false;
+                    }
+                };
+
+                const processClassifiedContent = async () => {
+                    try {
+                        isProcessing.value = true;
+
+                        if (!classificationResult.value.is_note) {
+                            showNotification('此内容不是笔记，已取消处理', 'warning');
+                            showPasteModal.value = false;
+                            return;
+                        }
+
+                        // 调用整理 API
+                        const organizeResponse = await axios.post(`${API_BASE}/organize-content`, {
+                            content: pasteContent.value,
+                            note_type: classificationResult.value.note_type
+                        });
+
+                        // 生成标题
+                        const title = pasteContent.value.split('\n')[0].substring(0, 50) || '无标题笔记';
+
+                        // 保存笔记
+                        await axios.post(`${API_BASE}/save-note`, {
+                            title: title,
+                            type: classificationResult.value.note_type,
+                            original_content: pasteContent.value,
+                            organized_markdown: await marked.parse(organizeResponse.data.organized_markdown),
+                            summary: organizeResponse.data.summary,
+                            tags: []
+                        });
+
+                        showNotification('笔记已保存'); await loadNotes();
+                        showPasteModal.value = false;
+                        pasteContent.value = '';
+                        classificationResult.value = null;
+                        await loadNotes();
+                    } catch (error) {
+                        showNotification('处理失败', 'error');
+                        console.error(error);
+                    } finally {
+                        isProcessing.value = false;
+                    }
+                };
+
+                const filterNotes = () => {
+                    // 过滤逻辑由 computed 属性处理
+                };
+
+                const saveNote = async () => {
+                    try {
+                        // 构建请求体
+                        const noteData = {
+                            title: editingNote.title,
+                            content: editingNote.content,
+                            tags: editingNote.tags || [],
+                            is_pinned: editingNote.is_pinned || false
+                        };
+                        
+                        // 调用后端 API
+                          if (!selectedNoteId.value) {
+                              showNotification('请先选择要保存的笔记', 'warning');
+                              return;
+                          }
+                          const response = await fetch(`${API_BASE}/notes/${selectedNoteId.value}/edit`, {
+                              method: 'PUT',
+                              headers: {
+                                  'Content-Type': 'application/json'
+                              },
+                              body: JSON.stringify(noteData)
+                          });
+                        
+                        if (response.ok) {
+                            // 保存成功后更新当前选中的笔记
+                            const updatedNote = await response.json();
+                            const index = notes.value.findIndex(note => note.id === selectedNoteId.value);
+                            if (index !== -1) {
+                                notes.value[index] = updatedNote;
+                                selectedNote.value = updatedNote;
+                            }
+                            
+                            // 显示成功通知并重新加载笔记
+                            showNotification('笔记已更新');
+                            await loadNotes();
+                            
+                            // 刷新页面数据
+                            selectedNote.value = notes.value.find(note => note.id === selectedNoteId.value) || null;
+                        } else {
+                            showNotification('保存失败', 'error');
+                        }
+                    } catch (error) {
+                        showNotification('保存失败', 'error');
+                    }
+                };
+
+                // 生命周期
+                onMounted(() => {
+                    loadNotes();
+                });
+
+                return {
+                    notes,
+                    selectedNote,
+                    selectedNoteId,
+                    searchQuery,
+                    filterType,
+                    currentTab,
+                    pasteContent,
+                    classificationResult,
+                    notifications,
+                    showNewNoteModal,
+                    showPasteModal,
+                    isLoadingNotes,
+                    isCreating,
+                    isClassifying,
+                    isProcessing,
+                    newNote,
+                    editingNote,
+                    selectedNotes,
+                    showDeleteConfirm,
+                    filteredNotes,
+                    formatDate,
+                    loadNotes,
+                    selectNote,
+                    createNote,
+                    classifyContent,
+                    processClassifiedContent,
+                    filterNotes,
+                    saveNote,
+                    deleteNotes,
+                    showNotification
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>
