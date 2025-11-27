@@ -36,12 +36,12 @@
 
 - **前端**：Vue.js 3 + 原生 CSS（暗色主题）
 - **后端**：Python Flask + REST API
-- **AI**：阿里云通义千问 API
+- **AI**：调用阿里云通义千问 API
 - **存储**：本地 Markdown 文件 + JSON 索引
 
 ## 项目结构
 
-\`\`\`
+```
 ai-noter/
 ├── 前端（Web UI）
 │   └── index.html                # Vue.js 应用
@@ -66,19 +66,19 @@ ai-noter/
     ├── README_BACKEND.md         # 后端文档
     ├── README_CLIPBOARD.md       # 剪切板文档
     └── README_FRONTEND.md        # 前端文档
-\`\`\`
+```
 
 ## 快速开始
 
 ### 最快开始方式
 
-\`\`\`bash
+```bash
 # Windows
 run_system.bat
 
 # macOS/Linux
 bash run_system.sh
-\`\`\`
+```
 
 详见 [QUICK_START.md](./QUICK_START.md)
 
@@ -91,21 +91,21 @@ bash run_system.sh
 判断内容是否为笔记及其类型。
 
 请求：
-\`\`\`json
+```json
 {
   "content": "用户复制的内容"
 }
-\`\`\`
+```
 
 响应：
-\`\`\`json
+```json
 {
   "is_note": true,
   "note_type": "待办事项",
   "confidence": 0.95,
   "reason": "包含明确的任务和截止日期"
 }
-\`\`\`
+```
 
 ### 整理 API
 
@@ -114,15 +114,15 @@ bash run_system.sh
 将内容整理为结构化 Markdown。
 
 请求：
-\`\`\`json
+```json
 {
   "content": "待整理的内容",
   "note_type": "零散知识"
 }
-\`\`\`
+```
 
 响应：
-\`\`\`json
+```json
 {
   "organized_markdown": "# 标题\n\n内容...",
   "key_dates": [
@@ -131,7 +131,7 @@ bash run_system.sh
   "key_points": ["要点1", "要点2"],
   "summary": "一句话总结"
 }
-\`\`\`
+```
 
 ### 笔记管理 API
 
@@ -143,7 +143,7 @@ bash run_system.sh
 
 创建 `.env` 文件：
 
-\`\`\`env
+```env
 # 必需：通义千问 API Key
 DASHSCOPE_API_KEY=sk-xxxxx
 
@@ -152,7 +152,7 @@ FLASK_ENV=development
 FLASK_DEBUG=False
 CLIPBOARD_CHECK_INTERVAL=1
 LOG_LEVEL=INFO
-\`\`\`
+```
 
 ## 数据存储
 
@@ -168,7 +168,7 @@ LOG_LEVEL=INFO
 
 `data/index.json` 维护所有笔记的快速索引：
 
-\`\`\`json
+```json
 [
   {
     "id": "20240115_120000",
@@ -181,7 +181,7 @@ LOG_LEVEL=INFO
     "tags": ["标签1", "标签2"]
   }
 ]
-\`\`\`
+```
 
 ## 故障排查
 
@@ -271,4 +271,3 @@ MIT License
 - ✅ 确保用户数据隐私安全
 
 **祝你使用愉快！如有问题，欢迎反馈。**
-\`\`\`
